@@ -652,16 +652,25 @@ func (c *Client) Do(req *retryablehttp.Request, v interface{}) (*Response, error
 		// in case the caller wants to inspect it further.
 		return response, err
 	}
-	resBody := resp.Body
+
+	bodyRes, err := ioutil.ReadAll(resp.Body)
+	resbody :=ioutil.NopCloser(bytes.NewReader(bodyRes))
 	buf := new(bytes.Buffer)
-	buf.ReadFrom(resBody)
+	buf.ReadFrom(resbody)
 	fmt.Println("======== response body =======" + buf.String())
+
+	bodyr, err := ioutil.ReadAll(resp.Body)
+	body := ioutil.NopCloser(bytes.NewReader(bodyr))
 
 	if v != nil {
 		if w, ok := v.(io.Writer); ok {
-			_, err = io.Copy(w, resBody)
+			fmt.Println("====== copy starting ======")
+			_, err = io.Copy(w, body)
+			if err != nil {
+				fmt.Println("====== copy error ======", err)
+			}
 		} else {
-			err = json.NewDecoder(resBody).Decode(v)
+			err = json.NewDecoder(body).Decode(v)
 		}
 	}
 
