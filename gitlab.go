@@ -656,11 +656,12 @@ func (c *Client) Do(req *retryablehttp.Request, v interface{}) (*Response, error
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(resBody)
 	fmt.Println("======== response body =======" + buf.String())
+
 	if v != nil {
 		if w, ok := v.(io.Writer); ok {
-			_, err = io.Copy(w, resp.Body)
+			_, err = io.Copy(w, resBody)
 		} else {
-			err = json.NewDecoder(resp.Body).Decode(v)
+			err = json.NewDecoder(resBody).Decode(v)
 		}
 	}
 
