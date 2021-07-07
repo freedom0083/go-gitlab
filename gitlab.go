@@ -658,19 +658,18 @@ func (c *Client) Do(req *retryablehttp.Request, v interface{}) (*Response, error
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(resbody)
 	fmt.Println("======== response body =======" + buf.String())
-
-	bodyr, err := ioutil.ReadAll(resp.Body)
-	body := ioutil.NopCloser(bytes.NewReader(bodyr))
+	resp.Body.Close()
+	resp.Body = ioutil.NopCloser(bytes.NewReader(bodyRes))
 
 	if v != nil {
 		if w, ok := v.(io.Writer); ok {
 			fmt.Println("====== copy starting ======")
-			_, err = io.Copy(w, body)
+			_, err = io.Copy(w, resp.Body)
 			if err != nil {
 				fmt.Println("====== copy error ======", err)
 			}
 		} else {
-			err = json.NewDecoder(body).Decode(v)
+			err = json.NewDecoder(resp.Body).Decode(v)
 		}
 	}
 
