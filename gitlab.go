@@ -655,12 +655,19 @@ func (c *Client) Do(req *retryablehttp.Request, v interface{}) (*Response, error
 
 	var mergeRequest []*MergeRequest
 	bodyRes, err := ioutil.ReadAll(resp.Body)
+	resbody :=ioutil.NopCloser(bytes.NewReader(bodyRes))
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(resbody)
+	fmt.Println("======== response body =======" + buf.String())
+
+	resp.Body.Close()
+	resbody =ioutil.NopCloser(bytes.NewReader(bodyRes))
+
 	err = json.Unmarshal(bodyRes, &mergeRequest)
 	if err != nil {
 		fmt.Println("====== Unmarshal error ====== " + err.Error())
 	}
 
-	resp.Body.Close()
 	resp.Body = ioutil.NopCloser(bytes.NewReader(bodyRes))
 
 	if v != nil {
