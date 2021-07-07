@@ -653,15 +653,19 @@ func (c *Client) Do(req *retryablehttp.Request, v interface{}) (*Response, error
 		return response, err
 	}
 
+	pipelineConfigType := new(MergeRequest)
 	bodyRes, err := ioutil.ReadAll(resp.Body)
-	resbody :=ioutil.NopCloser(bytes.NewReader(bodyRes))
-	buf := new(bytes.Buffer)
-	buf.ReadFrom(resbody)
-	fmt.Println("======== response body =======" + buf.String())
+	err = json.Unmarshal(bodyRes, pipelineConfigType)
+	if err != nil {
+		fmt.Println("====== Decode error ====== " + err.Error())
+		return response, err
+	}
+
 	resp.Body.Close()
 	resp.Body = ioutil.NopCloser(bytes.NewReader(bodyRes))
 
 	if v != nil {
+		fmt.Println("======== v != nil ======= ")
 		if w, ok := v.(io.Writer); ok {
 			fmt.Println("====== copy starting ======")
 			_, err = io.Copy(w, resp.Body)
@@ -669,7 +673,11 @@ func (c *Client) Do(req *retryablehttp.Request, v interface{}) (*Response, error
 				fmt.Println("====== copy error ======", err)
 			}
 		} else {
+			fmt.Println("====== Decode starting ======")
 			err = json.NewDecoder(resp.Body).Decode(v)
+			if err != nil {
+				fmt.Println("====== Decode error ====== " + err.Error())
+			}
 		}
 	}
 
