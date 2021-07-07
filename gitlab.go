@@ -655,7 +655,7 @@ func (c *Client) Do(req *retryablehttp.Request, v interface{}) (*Response, error
 	resBody := resp.Body
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(resBody)
-	fmt.Println(buf.String())
+	fmt.Println("======== response body =======" + buf.String())
 	if v != nil {
 		if w, ok := v.(io.Writer); ok {
 			_, err = io.Copy(w, resp.Body)
