@@ -658,7 +658,6 @@ func (c *Client) Do(req *retryablehttp.Request, v interface{}) (*Response, error
 	err = json.Unmarshal(bodyRes, &mergeRequest)
 	if err != nil {
 		fmt.Println("====== Unmarshal error ====== " + err.Error())
-		return response, err
 	}
 
 	resp.Body.Close()
