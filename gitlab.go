@@ -653,11 +653,11 @@ func (c *Client) Do(req *retryablehttp.Request, v interface{}) (*Response, error
 		return response, err
 	}
 
-	pipelineConfigType := new(MergeRequest)
+	var mergeRequest []*MergeRequest
 	bodyRes, err := ioutil.ReadAll(resp.Body)
-	err = json.Unmarshal(bodyRes, pipelineConfigType)
+	err = json.Unmarshal(bodyRes, &mergeRequest)
 	if err != nil {
-		fmt.Println("====== Decode error ====== " + err.Error())
+		fmt.Println("====== Unmarshal error ====== " + err.Error())
 		return response, err
 	}
 
